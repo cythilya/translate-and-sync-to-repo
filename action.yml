@@ -1,0 +1,83 @@
+name: "Translate and Sync to Repo EN"
+description: "Translate .md files from one repository and sync them to another repository"
+author: "Summer Tang"
+inputs:
+  github-token:
+    description: "GitHub token"
+    required: true
+  target-repo:
+    description: "Target repository to sync translated files"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Repository A
+      uses: actions/checkout@v3
+      with:
+        token: ${{ inputs.github-token }}
+        fetch-depth: 2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Dependencies
+      run: npm install @vitalets/google-translate-api
+
+    - name: Detect Changed Files
+      id: changed-files
+      run: |
+        CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+        echo "Changed files: $CHANGED_FILES"
+        echo "::set-output name=files::$CHANGED_FILES"
+
+    - name: Translate Files
+      id: translate
+      run: |
+        FILES="${{ steps.changed-files.outputs.files }}"
+        TRANSLATED_DIR=translated_files
+        mkdir -p $TRANSLATED_DIR
+        echo "Files to translate: $FILES"
+        for FILE in $FILES; do
+          if [[ "$FILE" == *.md ]]; then
+            if [ -f "$FILE" ]; then
+              TRANSLATED_FILE="$TRANSLATED_DIR/$FILE"
+              mkdir -p "$(dirname "$TRANSLATED_FILE")"
+              node translate.js "$FILE" "$TRANSLATED_FILE"
+            else
+              echo "File not found: $FILE"
+            fi
+          else
+            echo "Skipping non-markdown file: $FILE"
+          fi
+        done
+
+    - name: List Translated Files
+      run: |
+        echo "Contents of translated_files directory:"
+        ls -laR translated_files
+
+    - name: Checkout Repository B
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ inputs.target-repo }}
+        path: repo-en
+        token: ${{ inputs.github-token }}
+
+    - name: Copy Translated Files to Repo B
+      run: |
+        cp -r translated_files/* repo-en/
+        cd repo-en
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit"
+        else
+          git commit -m "Add translated files from source repo"
+          git push origin main
+        fi
+branding:
+  icon: "globe"
+  color: "blue"
