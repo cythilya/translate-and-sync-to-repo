@@ -1,4 +1,4 @@
-name: "Translate and Sync to Repo EN"
+name: "Translate and Sync to Repo"
 description: "Translate .md files from one repository and sync them to another repository"
 author: "Summer Tang"
 inputs:
