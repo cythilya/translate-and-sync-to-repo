@@ -1,15 +1,15 @@
-name: "Translate and Sync to Repo"
-description: "Translate .md files from one repository and sync them to another repository"
-author: "Summer Tang"
+name: 'Translate and Sync to Repo'
+description: 'Translate .md files from one repository and sync them to another repository'
+author: 'Summer Tang'
 inputs:
   github-token:
-    description: "GitHub token"
+    description: 'GitHub token'
     required: true
   target-repo:
-    description: "Target repository to sync translated files"
+    description: 'Target repository to sync translated files'
     required: true
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Checkout Repository A
       uses: actions/checkout@v3
@@ -24,6 +24,7 @@ runs:
 
     - name: Install Dependencies
       run: npm install @vitalets/google-translate-api
+      shell: bash
 
     - name: Detect Changed Files
       id: changed-files
@@ -31,6 +32,7 @@ runs:
         CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
         echo "Changed files: $CHANGED_FILES"
         echo "::set-output name=files::$CHANGED_FILES"
+      shell: bash
 
     - name: Translate Files
       id: translate
@@ -52,11 +54,13 @@ runs:
             echo "Skipping non-markdown file: $FILE"
           fi
         done
+      shell: bash
 
     - name: List Translated Files
       run: |
         echo "Contents of translated_files directory:"
         ls -laR translated_files
+      shell: bash
 
     - name: Checkout Repository B
       uses: actions/checkout@v2
@@ -78,6 +82,7 @@ runs:
           git commit -m "Add translated files from source repo"
           git push origin main
         fi
+      shell: bash
 branding:
-  icon: "globe"
-  color: "blue"
+  icon: 'globe'
+  color: 'blue'
