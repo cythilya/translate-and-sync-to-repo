@@ -10,20 +10,28 @@ This GitHub Action translates .md files from one repository and syncs them to an
 ## Example Usage
 
 ```yaml
-name: Use Translate and Sync to Repo EN Action
+name: Translate and Sync to Repo
 
 on:
   push:
     branches:
       - main
+    paths:
+      - '**/*.md'
 
 jobs:
   translate-and-sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Use Translate and Sync to Repo EN Action
-        uses: your-username/your-repo-name@v1.0.0
+      - name: Checkout Source Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Use Translate and Sync to Repo Action
+        uses: cythilya/translate-and-sync@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          target-repo: cythilya/front-end-testing-en
+          target-repo: your-username/target-repo
+```
