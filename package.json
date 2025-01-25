@@ -1,0 +1,19 @@
+{
+  "name": "translate-and-sync-to-repo",
+  "version": "1.0.4",
+  "description": "This GitHub Action translates .md files from one repository and syncs them to another repository.",
+  "main": "translate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cythilya/translate-and-sync-to-repo.git"
+  },
+  "author": "Summer Tang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cythilya/translate-and-sync-to-repo/issues"
+  },
+  "homepage": "https://github.com/cythilya/translate-and-sync-to-repo#readme"
+}
